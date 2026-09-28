@@ -15,10 +15,7 @@ function timeAgo(iso?: string) {
 
   if (Number.isNaN(time)) return "";
 
-  const seconds = Math.max(
-    0,
-    Math.floor((Date.now() - time) / 1000)
-  );
+  const seconds = Math.max(0, Math.floor((Date.now() - time) / 1000));
 
   if (seconds < 60) return "Just now";
 
@@ -41,12 +38,7 @@ function timeAgo(iso?: string) {
 }
 
 export default function RecentActivity() {
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch,
-  } = useGetRecentActivityQuery({});
+  const { data, isLoading, isError, refetch } = useGetRecentActivityQuery({});
 
   const items = data?.data ?? [];
 
@@ -80,13 +72,10 @@ export default function RecentActivity() {
       {/* Body */}
       <div className="mt-3">
         {/* Loading */}
-        {isLoading ? (
+        {isLoading ?
           <div className="space-y-3 rounded-xl border border-[#e6eeec] bg-[#fafcfb] px-4 py-3">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-4"
-              >
+              <div key={index} className="flex items-start gap-4">
                 <span className="mt-1 h-[11px] w-[11px] shrink-0 animate-pulse rounded-full bg-[#dfe8e6]" />
 
                 <div className="flex-1 space-y-2">
@@ -97,7 +86,7 @@ export default function RecentActivity() {
               </div>
             ))}
           </div>
-        ) : isError ? (
+        : isError ?
           /* Error */
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#dfe8e6] bg-[#fafcfb] px-4 py-6 text-center">
             <p className="text-sm font-semibold text-[#102526]">
@@ -116,7 +105,7 @@ export default function RecentActivity() {
               Try again
             </button>
           </div>
-        ) : items.length === 0 ? (
+        : items.length === 0 ?
           /* Empty */
           <div className="relative overflow-hidden rounded-xl border border-[#e6eeec] bg-[#fafcfb] px-4 py-3">
             <div className="relative space-y-3">
@@ -161,8 +150,7 @@ export default function RecentActivity() {
               </p>
             </div>
           </div>
-        ) : (
-          /* Activity List */
+        : /* Activity List */
           <ol className="relative space-y-1">
             <div className="absolute bottom-4 left-[5px] top-4 w-px bg-[#e3ecea]" />
 
@@ -197,7 +185,7 @@ export default function RecentActivity() {
               );
             })}
           </ol>
-        )}
+        }
       </div>
     </div>
   );

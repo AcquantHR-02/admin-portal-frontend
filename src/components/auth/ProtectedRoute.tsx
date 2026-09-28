@@ -19,17 +19,11 @@ function getServerSnapshot() {
   return null;
 }
 
-export default function ProtectedRoute({
-  children,
-}: ProtectedRouteProps) {
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const token = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getServerSnapshot
-  );
+  const token = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   useEffect(() => {
     if (token === null) {
@@ -37,9 +31,7 @@ export default function ProtectedRoute({
     }
 
     if (!token) {
-      router.replace(
-        `/login?redirect=${encodeURIComponent(pathname)}`
-      );
+      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
     }
   }, [token, pathname, router]);
 
