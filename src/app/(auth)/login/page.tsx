@@ -1,26 +1,21 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  LockKeyhole,
-  Mail,
-  ArrowRight,
-  ShieldCheck,
-  Headset,
-  Building2,
-} from "lucide-react";
+import { Eye, EyeOff, LockKeyhole, Mail, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { useLoginMutation } from "@/api/authApi";
 
+// Design ka font (Stitch wale UI jaisa clean, geometric look)
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
 /**
- * Small reusable hook that "types out" a string character by character.
+ * Types out a string character by character.
  * Used for the "Welcome to AcquantHR Portal" heading animation.
- *
- * speed  -> ms delay between each character
- * startDelay -> optional ms delay before typing starts (nice for page load)
  */
 function useTypewriter(text: string, speed = 45, startDelay = 150) {
   const [displayedText, setDisplayedText] = useState("");
@@ -59,25 +54,31 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [keepSignedIn, setKeepSignedIn] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   const { displayedText: welcomeText, isDone: welcomeDone } = useTypewriter(
     "Welcome to AcquantHR Portal",
     40,
-    200
+    200,
   );
+
+  // "Remember this workstation" -> sirf email yaad rakhte hain (password kabhi nahi)
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) setEmail(savedEmail);
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
-      const response = await login({
-        email,
-        password,
-      }).unwrap();
+      const response = await login({ email, password }).unwrap();
 
       sessionStorage.setItem("authToken", response.data.token);
       sessionStorage.setItem("userName", response.data.name);
+
+      if (rememberMe) localStorage.setItem("rememberedEmail", email);
+      else localStorage.removeItem("rememberedEmail");
 
       router.replace("/dashboard");
     } catch (err) {
@@ -89,214 +90,132 @@ export default function LoginPage() {
     if (!error) return "";
 
     if ("status" in error) {
-      if (error.status === 401) {
-        return "Invalid email or password.";
-      }
-
-      if (error.status === 403) {
+      if (error.status === 401) return "Invalid email or password.";
+      if (error.status === 403)
         return "You are not authorized to access the admin portal.";
-      }
-
-      if (typeof error.status === "number" && error.status >= 500) {
+      if (typeof error.status === "number" && error.status >= 500)
         return "Server error. Please try again later.";
-      }
     }
 
     return "Unable to sign in. Please check your details and try again.";
   };
 
+  const inputClass =
+    "h-11 w-full rounded-lg border border-[#e1ebe6] bg-[#f6faf8] pl-10 text-[13.5px] text-[#12241f] outline-none transition placeholder:text-[#9fb1a9] focus:border-[#0f6b58] focus:bg-white focus:ring-[3px] focus:ring-[#0f6b58]/10";
+
   return (
-    <main className="h-screen overflow-hidden bg-[#f3f6f5] text-[#0f1e1f]">
-      <div className="flex h-full items-center justify-center p-3 sm:p-6">
-        <div className="grid h-[88vh] max-h-[560px] w-full max-w-[840px] overflow-hidden rounded-[16px] border border-[#e1e8e6] bg-white shadow-[0_20px_60px_rgba(15,30,31,0.10)] lg:grid-cols-[0.95fr_1.15fr]">
-          {/* LEFT - BRANDING */}
-          <section className="relative hidden overflow-hidden bg-[#0b3c5d] lg:flex">
-            {/* Decorative shapes */}
-            <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/[0.04]" />
-            <div className="absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-white/[0.04]" />
+    <div
+      className={`${jakarta.className} flex min-h-screen flex-col bg-[radial-gradient(ellipse_at_top_left,#d6efe4_0%,#eef6f2_45%,#f7fbf9_100%)] text-[#12241f]`}
+    >
+      {/* ===== MAIN AREA: centered card ===== */}
+      <main className="flex flex-1 items-center justify-center p-4 sm:p-8">
+        <div className="grid w-full max-w-[1000px] overflow-hidden rounded-[22px] bg-white shadow-[0_30px_70px_rgba(11,74,61,0.16)] lg:min-h-[560px] lg:grid-cols-[1fr_1fr]">
+          {/* ---------- LEFT: BRAND PANEL ---------- */}
+          <section className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-b from-[#0b5a49] via-[#0a4d3f] to-[#073a30] p-10 lg:flex xl:p-12">
+            {/* Background decoration: 2 rings + 1 soft glow */}
+            <div className="pointer-events-none absolute -bottom-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full border border-white/5" />
+            <div className="pointer-events-none absolute -bottom-[7.5rem] left-1/2 h-[26rem] w-[26rem] -translate-x-1/2 rounded-full border border-white/5" />
+            <div
+              className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%)",
+              }}
+            />
 
-            <div className="relative z-10 flex h-full w-full flex-col justify-between px-7 py-7 xl:px-8">
-              {/* Tag */}
-              <div>
-                <span className="inline-block rounded-full border border-white/20 bg-white/5 px-2.5 py-1 text-[9px] font-semibold tracking-[0.14em] text-white/80">
-                  STATUTORY INTELLIGENCE SUITE
-                </span>
+            {/* Top: logo + heading + description */}
+            <div className="relative z-10">
+              <Image
+                src="/images/acquanthr-logo.png"
+                alt="AcquantHR"
+                width={150}
+                height={50}
+                loading="eager"
+                className="h-9 w-auto object-contain brightness-0 invert"
+              />
 
-                <h2 className="mt-3 text-[22px] font-semibold leading-[1.15] tracking-[-0.02em] text-white">
-                  Smart HR Solutions for a
-                  <br />
-                  Smarter Workplace.
-                </h2>
+              <h2 className="mt-16 max-w-[380px] text-[34px] font-bold leading-[1.15] tracking-[-0.02em] text-white">
+                Smart HR solutions for a{" "}
+                <span className="text-[#4ade9a]">smarter workplace.</span>
+              </h2>
 
-                <p className="mt-2 max-w-[320px] text-[12px] leading-5 text-white/65">
-                  End-to-end statutory governance, labor law automation, and
-                  institutional payroll processing built for modern corporate
-                  operations.
-                </p>
+              <p className="mt-5 max-w-[340px] text-[14px] leading-[1.7] text-white/70">
+                Manage users, roles, and statutory compliance from one secure
+                admin workspace.
+              </p>
+            </div>
 
-                {/* Stats */}
-                <div className="mt-4 flex gap-2.5">
-                  <div className="rounded-xl bg-white/10 px-3 py-2.5">
-                    <p className="text-[17px] font-bold text-white">2,000+</p>
-                    <p className="mt-0.5 text-[10px] leading-3.5 text-white/60">
-                      Labour Law Compliances
-                      <br />
-                      Automated
-                    </p>
-                  </div>
-
-                  <div className="rounded-xl bg-white/10 px-3 py-2.5">
-                    <p className="text-[17px] font-bold text-white">67+</p>
-                    <p className="mt-0.5 text-[10px] leading-3.5 text-white/60">
-                      Enterprise Clients Onboarded
-                    </p>
-                  </div>
-                </div>
-
-                {/* Audit box */}
-                <div className="mt-4 max-w-[320px] rounded-xl border border-white/10 bg-white/[0.06] p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <ShieldCheck size={13} className="text-white/70" />
-                      <span className="text-[10px] font-semibold tracking-wide text-white/80">
-                        AUDIT &amp; GOVERNANCE VALIDATED
-                      </span>
-                    </div>
-
-                    <span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[9px] font-semibold text-emerald-300">
-                      ACTIVE
-                    </span>
-                  </div>
-
-                  <div className="mt-2.5 flex flex-wrap gap-1.5">
-                    <span className="rounded-md bg-white/10 px-2 py-1 text-[9px] text-white/70">
-                      SOC 2 Type II Certified
-                    </span>
-                    <span className="rounded-md bg-white/10 px-2 py-1 text-[9px] text-white/70">
-                      Statutory ISO 9001
-                    </span>
-                    <span className="rounded-md bg-white/10 px-2 py-1 text-[9px] text-white/70">
-                      POSH Reconciled
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Testimonial + footer */}
-              <div>
-                <div className="mb-1.5 text-[12px] text-amber-400">★★★★★</div>
-                <p className="text-[9px] font-semibold tracking-wide text-white/60">
-                  100% Measurable Results &amp; ROI
-                </p>
-                <p className="mt-1.5 max-w-[320px] text-[11px] italic leading-4 text-white/55">
-                  &ldquo;AcquantHR turned our multi-state statutory audits
-                  from high-risk bottlenecks into predictable, push-button
-                  reconciliations.&rdquo;
-                </p>
-
-                <div className="mt-3 flex items-center justify-between text-[10px] text-white/40">
-                  <span>Corporate Bangalore HQ</span>
-                  <span>Est. 2025</span>
-                </div>
-              </div>
+            {/* Bottom: live status */}
+            <div className="relative z-10 flex items-center gap-2.5 text-[12.5px] font-medium text-white/80">
+              <span className="h-2 w-2 rounded-full bg-[#3ddc97] shadow-[0_0_8px_#3ddc97]" />
+              <span>All systems operational</span>
             </div>
           </section>
 
-          {/* RIGHT - LOGIN FORM */}
-          <section className="flex h-full flex-col justify-center overflow-y-auto px-6 py-6 sm:px-8 lg:px-10">
-            <div className="mx-auto w-full max-w-[360px]">
-              {/* Logo + status */}
-              <div className="mb-4 flex items-center justify-between">
-                <Image
-                  src="/acquanthr-logo.png"
-                  alt="AcquantHR"
-                  width={130}
-                  height={34}
-                  loading="eager"
-                  className="h-7 w-auto object-contain"
-                />
-
-                <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-1 text-[9px] font-medium text-emerald-600">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  All Systems Operational
-                </span>
-              </div>
-
+          {/* ---------- RIGHT: LOGIN FORM ---------- */}
+          <section className="flex flex-col px-7 py-8 sm:px-12">
+            <div className="mx-auto flex w-full max-w-[380px] flex-1 flex-col justify-center py-6">
               {/* Animated heading */}
-              <h1 className="min-h-[24px] text-[19px] font-semibold tracking-[-0.02em] text-[#0f1e1f]">
+              <h1 className="min-h-[36px] text-[26px] font-extrabold leading-tight tracking-tight text-[#0d2a23]">
                 {welcomeText}
                 <span
-                  className={`ml-0.5 inline-block w-[2px] translate-y-[2px] bg-[#0b3c5d] ${
+                  className={`ml-1 inline-block w-[3px] translate-y-[3px] rounded-sm bg-[#12b981] ${
                     welcomeDone ? "animate-pulse" : ""
                   }`}
                   style={{ height: "1em" }}
                 />
               </h1>
 
-              <p className="mt-1.5 text-[12px] leading-4 text-[#718281]">
-                Sign in to access your enterprise statutory compliance &amp;
-                payroll dashboard.
+              <p className="mt-2 text-[13px] leading-5 text-[#6b8078]">
+                Sign in with your enterprise credentials to access your
+                administrative workspace.
               </p>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+              <form onSubmit={handleSubmit} className="mt-7 space-y-4">
                 {/* Email */}
                 <div>
-                  <div className="mb-1 flex items-center justify-between">
-                    <label
-                      htmlFor="email"
-                      className="text-[11px] font-medium text-[#344849]"
-                    >
-                      Work Email <span className="text-red-500">*</span>
-                    </label>
-                    <span className="text-[9px] text-[#95a3a1]">
-                      Corporate Domain Required
-                    </span>
-                  </div>
+                  <label
+                    htmlFor="email"
+                    className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-[#365149]"
+                  >
+                    Work email
+                  </label>
 
                   <div className="relative">
                     <Mail
-                      size={14}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[#91a09f]"
+                      size={15}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8fa39a]"
                     />
-
                     <input
                       id="email"
                       type="email"
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
-                      placeholder="name@company.com"
+                      placeholder="Enter your work email"
                       autoComplete="email"
                       required
-                      className="h-9 w-full rounded-lg border border-[#d9e3e1] bg-[#fbfcfc] pl-9 pr-3 text-[12px] text-[#102526] outline-none transition placeholder:text-[#a0acab] focus:border-[#0b3c5d] focus:bg-white focus:ring-2 focus:ring-[#0b3c5d]/10"
+                      className={`${inputClass} pr-3`}
                     />
                   </div>
                 </div>
 
                 {/* Password */}
                 <div>
-                  <div className="mb-1 flex items-center justify-between">
+                  <div className="mb-1.5">
                     <label
                       htmlFor="password"
-                      className="text-[11px] font-medium text-[#344849]"
+                      className="text-[11px] font-bold uppercase tracking-wider text-[#365149]"
                     >
-                      Password <span className="text-red-500">*</span>
+                      Password
                     </label>
-
-                    <button
-                      type="button"
-                      className="text-[10px] font-medium text-[#0b3c5d] hover:underline"
-                    >
-                      Forgot password?
-                    </button>
                   </div>
 
                   <div className="relative">
                     <LockKeyhole
-                      size={14}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[#91a09f]"
+                      size={15}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8fa39a]"
                     />
-
                     <input
                       id="password"
                       type={showPassword ? "text" : "password"}
@@ -305,36 +224,40 @@ export default function LoginPage() {
                       placeholder="Enter your password"
                       autoComplete="current-password"
                       required
-                      className="h-9 w-full rounded-lg border border-[#d9e3e1] bg-[#fbfcfc] pl-9 pr-10 text-[12px] text-[#102526] outline-none transition placeholder:text-[#a0acab] focus:border-[#0b3c5d] focus:bg-white focus:ring-2 focus:ring-[#0b3c5d]/10"
+                      className={`${inputClass} pr-10`}
                     />
-
                     <button
                       type="button"
                       onClick={() => setShowPassword((previous) => !previous)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#91a09f] transition hover:text-[#0b3c5d]"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8fa39a] transition hover:text-[#0b4a3d]"
                       aria-label={
                         showPassword ? "Hide password" : "Show password"
                       }
                     >
-                      {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                      {showPassword ?
+                        <EyeOff size={15} />
+                      : <Eye size={15} />}
                     </button>
                   </div>
                 </div>
 
-                {/* Keep me signed in */}
-                <label className="flex cursor-pointer items-center gap-2 text-[11px] text-[#5b6c6a]">
+                {/* Remember me */}
+                <label className="flex cursor-pointer items-center gap-2 text-[12px] text-[#4a625a]">
                   <input
                     type="checkbox"
-                    checked={keepSignedIn}
-                    onChange={(event) => setKeepSignedIn(event.target.checked)}
-                    className="h-3.5 w-3.5 rounded border-[#c7d3d1] text-[#0b3c5d] focus:ring-[#0b3c5d]/30"
+                    checked={rememberMe}
+                    onChange={(event) => setRememberMe(event.target.checked)}
+                    className="h-4 w-4 cursor-pointer rounded border-[#cfe0d8] accent-[#0f6b58]"
                   />
-                  Keep me signed in for 30 days
+                  Remember this workstation
                 </label>
 
                 {/* API Error */}
                 {getErrorMessage() && (
-                  <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-600">
+                  <div
+                    role="alert"
+                    className="rounded-lg border border-[#f3d3c4] bg-[#fdf3ee] px-3 py-2 text-[12px] text-[#c1552f]"
+                  >
                     {getErrorMessage()}
                   </div>
                 )}
@@ -343,74 +266,41 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="group flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-[#0b3c5d] text-[12px] font-medium text-white transition hover:bg-[#092e47] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="group flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#0b4a3d] text-[13.5px] font-semibold text-white shadow-[0_8px_20px_rgba(11,74,61,0.25)] transition hover:bg-[#083a30] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isLoading ? (
+                  {isLoading ?
                     "Signing in..."
-                  ) : (
-                    <>
-                      Sign In to Portal
+                  : <>
+                      Sign in to Dashboard
                       <ArrowRight
-                        size={14}
+                        size={15}
                         className="transition-transform group-hover:translate-x-0.5"
                       />
                     </>
-                  )}
+                  }
                 </button>
               </form>
+            </div>
 
-              {/* Divider */}
-              <div className="my-3.5 flex items-center gap-3">
-                <div className="h-px flex-1 bg-[#e5ebea]" />
-                <span className="text-[9px] font-medium tracking-wide text-[#95a3a1]">
-                  OR SIGN IN WITH ENTERPRISE CREDENTIALS
-                </span>
-                <div className="h-px flex-1 bg-[#e5ebea]" />
-              </div>
-
-              {/* SSO */}
-              <button
-                type="button"
-                className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-[#d9e3e1] bg-white text-[12px] font-medium text-[#0b3c5d] transition hover:bg-[#f7faf9]"
-              >
-                <Building2 size={14} />
-                Continue with SAML SSO / Okta
-              </button>
-
-              {/* Security note */}
-              <div className="mt-4 flex items-center justify-between text-[10px] text-[#899795]">
-                <span className="flex items-center gap-1.5">
-                  <LockKeyhole size={12} />
-                  256-bit Bank-Grade Encryption
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  Session ID: ACQ-7029X-V
-                </span>
-              </div>
-
-              {/* Support */}
-              <div className="mt-3 flex items-start gap-2 rounded-lg bg-[#f2f7f6] px-3 py-2 text-[10px] leading-4 text-[#5b6c6a]">
-                <Headset size={13} className="mt-[1px] shrink-0" />
-                <span>
-                  Having trouble logging in? Contact IT Support at{" "}
-                  <a
-                    href="mailto:leads@acquanthr.com"
-                    className="font-medium text-[#0b3c5d] hover:underline"
-                  >
-                    leads@acquanthr.com
-                  </a>{" "}
-                  or call{" "}
-                  <span className="font-medium text-[#0b3c5d]">
-                    +91 9663411888
-                  </span>
-                  .
-                </span>
-              </div>
+            {/* Card footer */}
+            <div className="flex items-center border-t border-[#eef3f0] pt-4 text-[11px] text-[#8fa39a]">
+              <span className="flex items-center gap-1.5">
+                <LockKeyhole size={12} />
+                Secure administrator access
+              </span>
             </div>
           </section>
         </div>
-      </div>
-    </main>
+      </main>
+
+      {/* ===== PAGE FOOTER BAR ===== */}
+      <footer className="flex items-center justify-between px-6 py-3 text-[11px] text-[#6b8078]">
+        <span className="flex items-center gap-1.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#12b981]" />
+          Connected to AcquantHR Cloud
+        </span>
+        <span>© 2025 AcquantHR Inc. All rights reserved.</span>
+      </footer>
+    </div>
   );
 }

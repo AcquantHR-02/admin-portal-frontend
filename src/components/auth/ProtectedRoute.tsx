@@ -11,8 +11,9 @@ function subscribe() {
   return () => {};
 }
 
+// Missing token -> "" (logged out). null is reserved for the server render.
 function getSnapshot() {
-  return sessionStorage.getItem("authToken");
+  return sessionStorage.getItem("authToken") ?? "";
 }
 
 function getServerSnapshot() {

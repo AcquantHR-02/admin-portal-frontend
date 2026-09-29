@@ -114,7 +114,7 @@ export default function Sidebar() {
             "
           >
             <Image
-              src="/A-logo.png"
+              src="/images/A-logo.png"
               alt="AcquantHR"
               width={44}
               height={44}
@@ -125,7 +125,7 @@ export default function Sidebar() {
 
           {/* Expanded Logo */}
           <Image
-            src="/acquanthr-logo.png"
+            src="/images/acquanthr-logo.png"
             alt="AcquantHR"
             width={160}
             height={62}
