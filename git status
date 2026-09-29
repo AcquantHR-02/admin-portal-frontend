@@ -1,0 +1,50 @@
+[33mcommit bf23ffe49b9654630e213cff5614971164116040[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Rakesh Kumar <4urakesh0@gmail.com>
+Date:   Mon Sep 28 15:07:38 2026 +0530
+
+    Deleted Header and Footer
+
+[33mcommit 95c514f058beddd8482f7f9d8ceabc1f79473ec9[m
+Author: Rakesh Kumar <4urakesh0@gmail.com>
+Date:   Mon Sep 28 15:05:52 2026 +0530
+
+    Deleted unnecessary Files
+
+[33mcommit 1814b7b4719b86d6d7685d3e6be1b9097fb25791[m
+Author: Rakesh Kumar <4urakesh0@gmail.com>
+Date:   Mon Sep 28 10:20:58 2026 +0530
+
+    Revise README for Admin Portal project
+    
+    Updated README to reflect project details and features.
+
+[33mcommit b36003f8c23fa0f92f224b120123d5f47073a05e[m
+Author: Rakesh Kumar <4urakesh0@gmail.com>
+Date:   Mon Sep 28 10:15:32 2026 +0530
+
+    Created public folder for logo
+
+[33mcommit 2c91c7c5d7cc0eea7464da9c6edf53b09a403d51[m
+Merge: 335c739 620241a
+Author: Rakesh Kumar <4urakesh0@gmail.com>
+Date:   Mon Sep 28 10:08:00 2026 +0530
+
+    Merge master into main
+
+[33mcommit 335c739a87de9ecbb53ade0ddbb3df1e66e43e91[m
+Author: Rakesh Kumar <4urakesh0@gmail.com>
+Date:   Mon Sep 28 09:59:10 2026 +0530
+
+    Initial commit
+
+[33mcommit 620241af89ba3171921c0d42e3ce993666b9afa9[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m
+Author: Rakesh Kumar <4urakesh0@gmail.com>
+Date:   Mon Sep 28 09:51:44 2026 +0530
+
+    Added all The Features
+
+[33mcommit bb04ec33bf2a7938c6b5ccf08fe54d92af87203f[m
+Author: Rakesh Kumar <4urakesh0@gmail.com>
+Date:   Mon Sep 21 15:49:58 2026 +0530
+
+    Initial commit from Create Next App
